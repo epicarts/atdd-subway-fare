@@ -34,19 +34,19 @@ public class SubwayMap {
         SimpleDirectedWeightedGraph<Station, SectionEdge> graph = new SimpleDirectedWeightedGraph<>(SectionEdge.class);
         addVertex(graph);
         addEdge(graph, pathType);
-        addOppositeEdge(graph);
+        addOppositeEdge(graph, pathType);
         return graph;
     }
 
-    private void addOppositeEdge(SimpleDirectedWeightedGraph<Station, SectionEdge> graph) {
+    private void addOppositeEdge(SimpleDirectedWeightedGraph<Station, SectionEdge> graph, PathType pathType) {
         // 지하철 역의 연결 정보(간선)을 등록
         lines.stream()
                 .flatMap(it -> it.getSections().stream())
-                .map(it -> new Section(it.getLine(), it.getDownStation(), it.getUpStation(), it.getDistance()))
+                .map(it -> new Section(it.getLine(), it.getDownStation(), it.getUpStation(), it.getDistance(), it.getDuration()))
                 .forEach(it -> {
                     SectionEdge sectionEdge = SectionEdge.of(it);
                     graph.addEdge(it.getUpStation(), it.getDownStation(), sectionEdge);
-                    graph.setEdgeWeight(sectionEdge, it.getDistance());
+                    graph.setEdgeWeight(sectionEdge, pathType.getWeight(it));
                 });
     }
 
